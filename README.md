@@ -57,3 +57,46 @@ browser di mettere in cache le risorse separatamente. In questa versione:
   caricare invece di uno solo).
 - Non testato in un vero browser in questa sessione: prima del deploy consiglio una
   verifica visiva rapida e un test dei 3 form su un deploy di staging Netlify.
+
+## Changelog
+
+**Settembre 2026 — Fix struttura sezioni**
+- Corretto un bug per cui alcune sezioni della pagina "Corsi" (il blocco prezzi
+  "Un percorso serio / Costruito per te" con i pacchetti base/intermedio/avanzato)
+  restava visibile sopra ad altre sezioni invece di essere nascosto insieme al
+  resto. Ora è un blocco a sé (`corso-view-extra`) mostrato/nascosto correttamente
+  da `showView('corso')`, verificato su tutte le view del sito.
+
+**Settembre 2026 — Sezione Masterclass**
+- La sezione "Cinema Academy" (voce di menu e pagina `accademia-view`) è stata
+  rinominata e ristrutturata in **Masterclass**. Rimosso completamente il vecchio
+  contenuto legato al percorso biennale (hero "Accademia di Recitazione
+  Cinematografica e Televisiva", "Il percorso formativo", citazione, sbocchi
+  professionali con partnership Rita Axon Agency, CTA "Richiedi Colloquio
+  Conoscitivo") — quella pagina descriveva un corso biennale che non corrisponde
+  più all'offerta reale: le masterclass di cinema sono percorsi su misura da
+  mezza giornata a più giornate, non un corso annuale/biennale.
+- Nuova hero snella in cima alla pagina: "Masterclass di Cinema, Teatro e
+  Comunicazione", con sottotitolo che chiarisce il formato (mezza giornata o più
+  giornate, su misura, individuali o in gruppo, anche per aziende).
+- Sotto la hero, un'unica sezione **"Masterclass"** con 3 tab
+  (Cinema, Teatro, Comunicazione) selezionabili tramite la nuova funzione JS
+  `showMasterclassCat()` in `js/script.js`:
+  - **Cinema** (6): le stesse masterclass già presenti nel percorso (Grammatica
+    del Cinema & Prove di Set, Self-Tape & Provini, Lezioni con Casting Director,
+    Make Up & Posa Fotografica, Danza Musical & Preparazione Vocale,
+    Combattimento Scenico & Intimacy Coordination).
+  - **Teatro** (6, nuove): Improvvisazione, Stand-up Comedy, Analisi del Testo e
+    Messa in Scena, L'Uso delle Maschere, Clownerie, Dizione e Voce.
+  - **Comunicazione** (5): Public Speaking (contenuto ripreso dal vecchio blocco),
+    Video Speaking, Comunicazione Efficace, Comunicazione Non Verbale &
+    Linguaggio del Corpo, Personal Branding & Comunicazione sui Social.
+  - Ogni masterclass ha un link "Richiedi Info →" che apre un'email precompilata
+    (stesso meccanismo `mailto:` già usato altrove nel sito, nessun nuovo form
+    Netlify introdotto — zero rischio di rompere il tracciamento dei form
+    esistenti).
+- Nuove classi CSS aggiunte in fondo a `css/style.css` / `css/style.min.css`:
+  `.masterclass-tabs`, `.masterclass-tab`, `.masterclass-panel`,
+  `.masterclass-cta`.
+- Testato con Playwright su tutte le view del sito (desktop e mobile): nessun
+  errore JS, nessuna regressione sulle altre sezioni.

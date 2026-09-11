@@ -148,3 +148,13 @@ document.addEventListener('submit', function(e) {
     fetch('/', {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body: new URLSearchParams(new FormData(f)).toString()}).catch(function(){});
   }
 });
+
+// ── MASTERCLASS TABS (Cinema / Teatro / Comunicazione) ──
+function showMasterclassCat(cat) {
+  ['cinema', 'teatro', 'comunicazione'].forEach(function (c) {
+    var panel = document.getElementById('masterclass-panel-' + c);
+    var tab = document.getElementById('masterclass-tab-' + c);
+    if (panel) panel.style.display = (c === cat ? 'grid' : 'none');
+    if (tab) tab.classList.toggle('active', c === cat);
+  });
+}
