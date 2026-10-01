@@ -16,8 +16,8 @@ if(v==='corso'){var extra=document.getElementById('corso-view-extra');if(extra){
 // Urgency bar
 [`urgency-bar`,`urgency-popup`].forEach(function(id){var el=document.getElementById(id);el&&(el.style.display=v===`site`?``:`none`)});
 // Mobile menu close
-var mm=document.getElementById(`mobileMenu`);mm&&(mm.style.display=`none`);
-var hb=document.getElementById(`hamburger`);hb&&hb.classList.remove(`open`);
+var mm=document.getElementById(`mobileMenu`);mm&&(mm.style.display=`none`,mm.classList.remove(`open`));
+var hb=document.getElementById(`hamburger`);hb&&(hb.classList.remove(`open`),hb.setAttribute(`aria-expanded`,`false`));
 document.body.style.overflow=``;
 // Nav active highlight
 document.querySelectorAll(`.nav-links a`).forEach(function(a){
@@ -25,7 +25,66 @@ document.querySelectorAll(`.nav-links a`).forEach(function(a){
   (a.getAttribute(`onclick`)||``).indexOf(`showView('`+v+`')`)>-1&&a.classList.add(`nav-active`);
 });
 window.scrollTo(0,0);
-}function toggleMenu(){var menu=document.getElementById(`mobileMenu`),ham=document.getElementById(`hamburger`);!menu||!ham||(menu.style.display===`flex`?(menu.style.display=`none`,ham.classList.remove(`open`),document.body.style.overflow=``):(menu.style.display=`flex`,ham.classList.add(`open`),document.body.style.overflow=`hidden`))}
+if (window.__triggerReveal) window.__triggerReveal();
+// Deep link: aggiorna l'URL con la sezione corrente, così si può linkare
+// o condividere direttamente una sezione (es. sito.it/#corsi) e il tasto
+// indietro del browser torna alla sezione precedente.
+if (!window.__spaSuppressPush) {
+  try {
+    var __hash = '#' + v;
+    if (location.hash !== __hash) { history.pushState({view:v}, '', __hash); }
+  } catch(e){}
+}
+}
+// ── BOLLE DI SAPONE: decorazione fluttuante, si muove su/giù con lo scroll ──
+(function(){
+  var layer = document.getElementById('bubbles-layer');
+  if (!layer) return;
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduceMotion) return;
+  var palette = [
+    ['#78e08a55','#5cc9f522'],
+    ['#f7615255','#78e08a22'],
+    ['#5cc9f555','#f7615222'],
+    ['#78e08a44','#8200e822']
+  ];
+  var n = window.innerWidth < 700 ? 7 : 13;
+  var bubbles = [];
+  for (var i = 0; i < n; i++) {
+    var b = document.createElement('div');
+    b.className = 'bubble';
+    var size = 16 + Math.random() * 58;
+    b.style.width = size + 'px';
+    b.style.height = size + 'px';
+    b.style.left = (Math.random() * 94) + 'vw';
+    b.style.top = (Math.random() * 90) + 'vh';
+    var c = palette[i % palette.length];
+    b.style.setProperty('--bubble-c1', c[0]);
+    b.style.setProperty('--bubble-c2', c[1]);
+    layer.appendChild(b);
+    bubbles.push({
+      el: b,
+      speed: (Math.random() * 0.6 + 0.2) * (i % 2 === 0 ? 1 : -1),
+      bobAmp: 8 + Math.random() * 16,
+      bobSpeed: 0.0004 + Math.random() * 0.0006,
+      phase: Math.random() * Math.PI * 2
+    });
+  }
+  function tick(t) {
+    var y = window.scrollY || window.pageYOffset || 0;
+    for (var i = 0; i < bubbles.length; i++) {
+      var bub = bubbles[i];
+      var bob = Math.sin(t * bub.bobSpeed + bub.phase) * bub.bobAmp;
+      var parallax = -(y * bub.speed * 0.12);
+      var drift = Math.cos(t * bub.bobSpeed * 0.7 + bub.phase) * 8;
+      bub.el.style.transform = 'translate(' + drift + 'px,' + (bob + parallax) + 'px)';
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
+function toggleMenu(){var menu=document.getElementById(`mobileMenu`),ham=document.getElementById(`hamburger`);!menu||!ham||(menu.style.display===`flex`?(menu.classList.remove(`open`),ham.classList.remove(`open`),ham.setAttribute(`aria-expanded`,`false`),document.body.style.overflow=``,setTimeout(function(){menu.style.display=`none`},280)):(menu.style.display=`flex`,requestAnimationFrame(function(){menu.classList.add(`open`)}),ham.classList.add(`open`),ham.setAttribute(`aria-expanded`,`true`),document.body.style.overflow=`hidden`))}
 // Close menu when clicking outside
 document.addEventListener(`click`,function(e){var nav=document.getElementById(`navLinks`),ham=document.getElementById(`hamburger`);!nav||!ham||nav.classList.contains(`open`)&&!nav.contains(e.target)&&!ham.contains(e.target)&&(nav.classList.remove(`open`),ham.classList.remove(`open`),document.body.style.overflow=``)});
 ;
@@ -42,16 +101,30 @@ var box=document.getElementById(`about-stats-box`);if(box){var triggered=!1,obs=
 
 // ── REVEAL ANIMATION OBSERVER ────────────────────────
 (function(){
-  if(!window.IntersectionObserver) return;
+  if(!window.IntersectionObserver){
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('visible'); });
+    return;
+  }
   var obs = new IntersectionObserver(function(entries){
     entries.forEach(function(e){
       if(e.isIntersecting){
-        e.target.classList.add('revealed');
+        e.target.classList.add('visible');
         obs.unobserve(e.target);
       }
     });
   }, {threshold:0.1});
   document.querySelectorAll('.reveal').forEach(function(el){ obs.observe(el); });
+  // Ricontrollo manuale dopo un cambio di view (gli elementi appena mostrati
+  // potrebbero già essere in viewport e l'observer non li ha ancora notificati)
+  window.__triggerReveal = function(){
+    document.querySelectorAll('.reveal:not(.visible)').forEach(function(el){
+      var r = el.getBoundingClientRect();
+      if (r.top < window.innerHeight && r.bottom > 0) {
+        el.classList.add('visible');
+        obs.unobserve(el);
+      }
+    });
+  };
 })();
 
 // ── HIGHLIGHT COURSE SECTION ─────────────────────────
@@ -157,4 +230,48 @@ function showMasterclassCat(cat) {
     if (panel) panel.style.display = (c === cat ? 'grid' : 'none');
     if (tab) tab.classList.toggle('active', c === cat);
   });
+  if (window.__triggerReveal) requestAnimationFrame(function(){ window.__triggerReveal(); });
 }
+
+// ── LINK DIRETTI ALLE SEZIONI (deep link) ───────────────
+// Permette di condividere/aprire un link tipo sito.it/#corsi e arrivare
+// direttamente a quella sezione, invece che sempre alla home. Gestisce
+// anche il tasto Indietro/Avanti del browser.
+(function(){
+  var validViews = ['site','corsi','accademia','chisiamo','eventi','b2b','corso','pf','openday','contatti','gallery','metodo'];
+
+  function viewFromHash(){
+    var h = (location.hash || '').replace('#', '');
+    return validViews.indexOf(h) > -1 ? h : null;
+  }
+
+  // Richiama showView senza far scattare un nuovo pushState (lo gestiamo
+  // già qui separatamente con replaceState, per non "sporcare" la history
+  // con doppie voci quando sincronizziamo invece di navigare).
+  function goTo(v){
+    if (typeof showView !== 'function') return;
+    window.__spaSuppressPush = true;
+    try { showView(v); } finally { window.__spaSuppressPush = false; }
+  }
+
+  function init(){
+    var v = viewFromHash();
+    if (v) {
+      goTo(v);
+      history.replaceState({view:v}, '', '#' + v);
+    } else {
+      history.replaceState({view:'site'}, '', location.pathname + location.search);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  window.addEventListener('popstate', function(e){
+    var v = (e.state && e.state.view) || viewFromHash() || 'site';
+    goTo(v);
+  });
+})();

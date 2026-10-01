@@ -553,6 +553,8 @@ button { font-family: inherit; cursor: pointer; }
 
   .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
 .about-stats { display: grid; grid-template-columns: 1fr 1fr; border: 1px solid rgba(0,0,60,.12); border-radius: 8px; overflow: hidden; }
+.about-stats-spacer { pointer-events: none; user-select: none; }
+@media (max-width: 900px) { .about-stats-spacer { display: none; } }
 .about-stat { padding: 28px 24px; border-right: 1px solid rgba(0,0,60,.12); border-bottom: 1px solid rgba(0,0,60,.12); display: flex; flex-direction: column; gap: 8px; }
 .about-stat:nth-child(2n) { border-right: none; }
 .about-stat:nth-last-child(-n+2) { border-bottom: none; }
@@ -4021,3 +4023,149 @@ body { overflow-x: hidden; }
 .masterclass-cta{display:inline-block;margin-top:10px;color:#a78bfa;font-family:'Nunito Sans',sans-serif;font-size:.76rem;font-weight:800;letter-spacing:.04em;text-transform:uppercase;text-decoration:none;cursor:pointer}
 .masterclass-cta:hover{color:#c4b0fc}
 @media (max-width:600px){.masterclass-tabs{gap:8px}.masterclass-tab{padding:8px 16px;font-size:.76rem}}
+
+/* ── WOW: bolle, micro-interazioni, divisore a pieghe ── */
+
+/* ══ BOLLE DI SAPONE — decorazione che fluttua con lo scroll ══ */
+#bubbles-layer{
+  position:fixed;inset:0;z-index:2;pointer-events:none;overflow:hidden;
+}
+.bubble{
+  position:absolute;border-radius:50%;opacity:.85;
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255,255,255,.95) 0%, rgba(255,255,255,.35) 12%, rgba(255,255,255,0) 30%),
+    radial-gradient(circle at 72% 78%, rgba(255,255,255,.3) 0%, rgba(255,255,255,0) 26%),
+    radial-gradient(circle, var(--bubble-c1,#78e08a33) 0%, var(--bubble-c2,#5cc9f51f) 55%, rgba(255,255,255,.04) 100%);
+  border:1px solid rgba(255,255,255,.4);
+  box-shadow:inset -5px -5px 10px rgba(0,0,0,.12), inset 3px 3px 8px rgba(255,255,255,.3), 0 6px 16px rgba(0,0,0,.1);
+  will-change:transform;
+}
+@media (prefers-reduced-motion:reduce){
+  #bubbles-layer{ display:none; }
+}
+@media (max-width:700px){
+  .bubble{ opacity:.65; }
+}
+
+/* ══ DIVISORE A PIEGHE (motivo teatrale ricorrente) ══ */
+.curtain-divider{
+  height:10px;
+  background:repeating-linear-gradient(90deg,
+    #78e08a4d 0 2.5%, #78e08a1a 2.5% 5%);
+  opacity:.7;
+}
+
+/* ══ MICRO-INTERAZIONI — pulsanti e link ══ */
+.btn-primary,.btn-ghost,.btn-dark,.btn-secondary,.btn-outline-dark{
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1),background .25s ease,color .25s ease,border-color .25s ease,box-shadow .25s ease !important;
+}
+.btn-primary:hover,.btn-dark:hover{ box-shadow:0 8px 24px rgba(247,97,82,.28); }
+.btn-primary:active,.btn-ghost:active,.btn-dark:active,.btn-secondary:active,.btn-outline-dark:active{
+  transform:scale(.96);
+}
+.masterclass-tab{ transition:background .22s cubic-bezier(.4,0,.2,1),color .22s ease,border-color .22s ease,transform .15s ease !important; }
+.masterclass-tab:active{ transform:scale(.95); }
+.masterclass-cta{ transition:color .2s ease,gap .2s ease,transform .15s ease; display:inline-flex; align-items:center; gap:4px; }
+.masterclass-cta:hover{ gap:8px; }
+.academy-module{ transition:border-color .25s ease,transform .25s cubic-bezier(.4,0,.2,1),background .25s ease !important; }
+.academy-module:hover{ border-color:#a78bfa66; transform:translateY(-3px); background:#ffffff12; }
+.academy-module:hover .academy-module-icon{ transform:scale(1.18) rotate(-4deg); }
+.academy-module-icon{ transition:transform .3s cubic-bezier(.34,1.56,.64,1); display:inline-block; }
+
+/* ══ REVEAL — stagger aggiuntivi per griglie più larghe ══ */
+.reveal-delay-5{ transition-delay:.5s; animation-delay:1.55s; }
+.reveal-delay-6{ transition-delay:.6s; animation-delay:1.70s; }
+
+/* ══ MENU MOBILE — pulsante "Menu/Chiudi" e drawer, redesign ══ */
+.hamburger{
+  flex-direction:row !important;
+  align-items:center !important;
+  justify-content:flex-start !important;
+  gap:7px !important;
+  width:auto !important;
+  height:auto !important;
+  position:relative;
+  background:transparent !important;
+  border:none !important;
+  border-radius:0 !important;
+  padding:6px 2px !important;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1) !important;
+}
+.hamburger:hover{ transform:scale(1.05) !important; }
+.hamburger:active{ transform:scale(.92) !important; }
+.hamburger .ham-word{
+  font-family:'Nunito Sans',sans-serif;
+  font-size:1.05rem;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-.01em;
+  text-transform:uppercase;
+  color:var(--crema);
+  white-space:nowrap;
+  position:relative;
+  display:inline-block;
+  vertical-align:middle;
+  border-radius:20px;
+  transition:opacity .35s cubic-bezier(.34,1.56,.64,1),transform .35s cubic-bezier(.34,1.56,.64,1),color .25s ease;
+}
+.hamburger .ham-word-open{ opacity:1; transform:translateY(0) rotate(0deg); min-width:66px; }
+.hamburger:hover .ham-word-open{ color:var(--oro); }
+.hamburger .ham-word-close{
+  position:absolute; left:0; top:50%;
+  opacity:0; transform:translateY(calc(-50% + 8px)) rotate(-6deg);
+  color:#F76152;
+}
+.hamburger.open .ham-word-open{ opacity:0; transform:translateY(-8px) rotate(6deg); }
+.hamburger.open .ham-word-close{ opacity:1; transform:translateY(-50%) rotate(0deg); }
+.hamburger .ham-word-open::after{
+  content:'';
+  position:absolute; left:1px; right:1px; bottom:-3px; height:3px;
+  border-radius:3px;
+  background:linear-gradient(90deg,var(--oro),var(--rosso));
+  transform:scaleX(0); transform-origin:left;
+  transition:transform .35s cubic-bezier(.4,0,.2,1);
+}
+.hamburger:hover .ham-word-open::after{ transform:scaleX(1); }
+
+#mobileMenu{
+  background:linear-gradient(180deg,#050512 0%,#030316 55%,#030316 100%) !important;
+  opacity:0;
+  transform:translateY(-10px);
+  transition:opacity .3s cubic-bezier(.4,0,.2,1),transform .3s cubic-bezier(.4,0,.2,1);
+}
+#mobileMenu.open{ opacity:1; transform:translateY(0); }
+#mobileMenu a{
+  position:relative;
+  opacity:0;
+  transform:translateX(-16px);
+  transition:opacity .4s ease,transform .4s cubic-bezier(.4,0,.2,1),background .2s ease,padding-left .2s ease !important;
+}
+#mobileMenu > div{
+  opacity:0;
+  transform:translateX(-16px);
+  transition:opacity .4s ease,transform .4s cubic-bezier(.4,0,.2,1);
+}
+#mobileMenu.open a,#mobileMenu.open > div{ opacity:1; transform:translateX(0); }
+#mobileMenu.open a:nth-of-type(1){ transition-delay:.05s; }
+#mobileMenu.open a:nth-of-type(2){ transition-delay:.09s; }
+#mobileMenu.open a:nth-of-type(3){ transition-delay:.13s; }
+#mobileMenu.open a:nth-of-type(4){ transition-delay:.17s; }
+#mobileMenu.open a:nth-of-type(5){ transition-delay:.21s; }
+#mobileMenu.open a:nth-of-type(6){ transition-delay:.25s; }
+#mobileMenu.open a:nth-of-type(7){ transition-delay:.29s; }
+#mobileMenu.open > div{ transition-delay:.33s; }
+#mobileMenu a::before{
+  content:'';
+  position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:linear-gradient(180deg,var(--oro),var(--rosso));
+  transform:scaleY(0); transform-origin:top;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+#mobileMenu a:active{ background:rgba(120,224,138,.06); padding-left:34px !important; }
+#mobileMenu a:active::before{ transform:scaleY(1); }
+@media (prefers-reduced-motion:reduce){
+  .hamburger .ham-word,#mobileMenu,#mobileMenu a,#mobileMenu > div{ transition:none !important; }
+  #mobileMenu a,#mobileMenu > div{ opacity:1 !important; transform:none !important; }
+  #mobileMenu{ opacity:1 !important; transform:none !important; }
+}
+
