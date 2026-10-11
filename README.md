@@ -343,6 +343,22 @@ disallineati.
   di box: differenza 0px) e con screenshot desktop e mobile. Rieseguita
   la suite completa: nessun errore JavaScript, nessuna regressione.
 
+**Ottobre 2026 — Rimosse le bolle di sapone**
+
+Segnalato: la decorazione a bolle di sapone non piaceva (feedback della
+socia).
+
+- **Fix**: rimossi completamente il layer HTML (`#bubbles-layer`), tutto il
+  CSS dedicato (`#bubbles-layer`, `.bubble`, le relative media query per
+  `prefers-reduced-motion` e mobile) e l'intera animazione JavaScript che le
+  generava e muoveva allo scroll (`js/script.js`). Lo sfondo torna neutro,
+  senza alcuna decorazione animata.
+- In discussione una possibile sostituzione con un effetto grafico 3D sullo
+  sfondo, da definire meglio prima di iniziare qualsiasi sviluppo.
+- Verificato con Playwright su tutte le 8 view principali e su mobile:
+  nessun elemento `.bubble` presente (conteggio 0), nessun errore
+  JavaScript, nessuna regressione sul menu mobile e sui deep link.
+
 **Ottobre 2026 — Link diretti alle sezioni (deep link)**
 
 Richiesta: poter mandare un link che apre direttamente una sezione del

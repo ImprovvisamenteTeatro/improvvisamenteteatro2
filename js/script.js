@@ -36,53 +36,6 @@ if (!window.__spaSuppressPush) {
   } catch(e){}
 }
 }
-// ── BOLLE DI SAPONE: decorazione fluttuante, si muove su/giù con lo scroll ──
-(function(){
-  var layer = document.getElementById('bubbles-layer');
-  if (!layer) return;
-  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (reduceMotion) return;
-  var palette = [
-    ['#78e08a55','#5cc9f522'],
-    ['#f7615255','#78e08a22'],
-    ['#5cc9f555','#f7615222'],
-    ['#78e08a44','#8200e822']
-  ];
-  var n = window.innerWidth < 700 ? 7 : 13;
-  var bubbles = [];
-  for (var i = 0; i < n; i++) {
-    var b = document.createElement('div');
-    b.className = 'bubble';
-    var size = 16 + Math.random() * 58;
-    b.style.width = size + 'px';
-    b.style.height = size + 'px';
-    b.style.left = (Math.random() * 94) + 'vw';
-    b.style.top = (Math.random() * 90) + 'vh';
-    var c = palette[i % palette.length];
-    b.style.setProperty('--bubble-c1', c[0]);
-    b.style.setProperty('--bubble-c2', c[1]);
-    layer.appendChild(b);
-    bubbles.push({
-      el: b,
-      speed: (Math.random() * 0.6 + 0.2) * (i % 2 === 0 ? 1 : -1),
-      bobAmp: 8 + Math.random() * 16,
-      bobSpeed: 0.0004 + Math.random() * 0.0006,
-      phase: Math.random() * Math.PI * 2
-    });
-  }
-  function tick(t) {
-    var y = window.scrollY || window.pageYOffset || 0;
-    for (var i = 0; i < bubbles.length; i++) {
-      var bub = bubbles[i];
-      var bob = Math.sin(t * bub.bobSpeed + bub.phase) * bub.bobAmp;
-      var parallax = -(y * bub.speed * 0.12);
-      var drift = Math.cos(t * bub.bobSpeed * 0.7 + bub.phase) * 8;
-      bub.el.style.transform = 'translate(' + drift + 'px,' + (bob + parallax) + 'px)';
-    }
-    requestAnimationFrame(tick);
-  }
-  requestAnimationFrame(tick);
-})();
 
 function toggleMenu(){var menu=document.getElementById(`mobileMenu`),ham=document.getElementById(`hamburger`);!menu||!ham||(menu.style.display===`flex`?(menu.classList.remove(`open`),ham.classList.remove(`open`),ham.setAttribute(`aria-expanded`,`false`),document.body.style.overflow=``,setTimeout(function(){menu.style.display=`none`},280)):(menu.style.display=`flex`,requestAnimationFrame(function(){menu.classList.add(`open`)}),ham.classList.add(`open`),ham.setAttribute(`aria-expanded`,`true`),document.body.style.overflow=`hidden`))}
 // Close menu when clicking outside
